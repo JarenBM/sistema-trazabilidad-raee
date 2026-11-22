@@ -1,0 +1,32 @@
+name: CI Backend
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+      JWT_SECRET: secreto_de_pruebas_con_mas_de_32_caracteres_123456
+      JWT_EXPIRACION_MINUTOS: "60"
+      CORS_ORIGINS: http://localhost:4200
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+
+      - run: uv python install
+
+      - run: uv sync --locked
+
+      - run: uv run pytest -q

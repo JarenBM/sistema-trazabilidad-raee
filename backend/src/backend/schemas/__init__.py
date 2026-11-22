@@ -1,0 +1,1 @@
+"""Modelos Pydantic v2 de entrada y salida."""
