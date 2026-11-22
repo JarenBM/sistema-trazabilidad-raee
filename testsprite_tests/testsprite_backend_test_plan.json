@@ -1,0 +1,52 @@
+[
+  {
+    "id": "TC001",
+    "title": "health check database status",
+    "description": "Call GET /api/health and verify it returns HTTP 200 with API and database status when the database is available. When database connectivity is unavailable, verify the response indicates an error or degraded database status."
+  },
+  {
+    "id": "TC002",
+    "title": "citizen registration validation",
+    "description": "Submit valid citizen data to POST /api/auth/registro and verify HTTP 201, the CIUDADANO role, and an active account. Also verify duplicate email returns HTTP 409 and invalid fields return HTTP 422."
+  },
+  {
+    "id": "TC003",
+    "title": "administrator creates collection center",
+    "description": "As an administrator, submit valid center details to POST /api/centros and verify HTTP 201 with a center ID. Verify invalid ubigeo or out-of-range coordinates return HTTP 422, and a non-administrator receives HTTP 403."
+  },
+  {
+    "id": "TC004",
+    "title": "public center catalog filtering",
+    "description": "Call GET /api/catalogos/centros with solo_activos=true and verify only active centers are returned. Call with solo_activos=false and verify inactive centers may also be included; malformed query values should return HTTP 422."
+  },
+  {
+    "id": "TC005",
+    "title": "public tracking lookup privacy",
+    "description": "Call GET /api/publico/rastreo/{codigo_seguimiento} with a valid tracking code and verify the device details and history are returned without personal data. Verify lookup is case-insensitive and an unknown code returns HTTP 404."
+  },
+  {
+    "id": "TC006",
+    "title": "citizen device registration",
+    "description": "As an authenticated citizen, submit valid device data to POST /api/raee and verify HTTP 201, a unique tracking code, and the initial REGISTRADO state. Verify unauthenticated access returns HTTP 401 and invalid category or fields return HTTP 422."
+  },
+  {
+    "id": "TC007",
+    "title": "delivery request creation rules",
+    "description": "As a citizen, create a delivery request through POST /api/solicitudes for an owned device in REGISTRADO state and verify HTTP 201. Verify a second pending request for the same device returns HTTP 409 and invalid request data returns HTTP 422."
+  },
+  {
+    "id": "TC008",
+    "title": "center staff receives delivery request",
+    "description": "As the assigned center staff member, call PATCH /api/solicitudes/{id_solicitud}/recepcionar for a pending request and verify HTTP 200, the request becomes COMPLETADA, and the device becomes RECIBIDO. Verify requests belonging to another center or already completed requests are rejected."
+  },
+  {
+    "id": "TC009",
+    "title": "technical evaluation eligibility",
+    "description": "As center staff, submit a valid evaluation to POST /api/evaluaciones for a device received at the staff member's center and verify HTTP 201 and the device moves to EVALUADO. Verify an ineligible device returns HTTP 409 and invalid evaluation values return HTTP 422."
+  },
+  {
+    "id": "TC010",
+    "title": "administrator summary report",
+    "description": "As an administrator, call GET /api/reportes/resumen and verify the response includes totals by device state and total, valorizable, and final-disposal weight metrics. Verify a non-administrator receives HTTP 403 and an empty dataset produces zero or near-zero metrics."
+  }
+]
