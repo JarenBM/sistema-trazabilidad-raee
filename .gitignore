@@ -179,3 +179,5 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+testsprite_tests/tmp/
+testsprite_tests/tmp/config.json
