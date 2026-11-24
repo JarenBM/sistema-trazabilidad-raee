@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, status
 from ..schemas.solicitudes import (
     OperacionRespuesta,
     SolicitudCentroRespuesta,
+    SolicitudCiudadanoRespuesta,
     SolicitudCreadaRespuesta,
     SolicitudCrearRequest,
 )
@@ -25,6 +26,17 @@ def crear_solicitud(
     usuario: UsuarioAutenticado = Depends(requerir_roles("CIUDADANO")),
 ) -> SolicitudCreadaRespuesta:
     return solicitudes_service.crear(datos, usuario.id_usuario)
+
+
+@router.get(
+    "/mias",
+    response_model=list[SolicitudCiudadanoRespuesta],
+    summary="Listar las solicitudes del ciudadano autenticado",
+)
+def listar_mis_solicitudes(
+    usuario: UsuarioAutenticado = Depends(requerir_roles("CIUDADANO")),
+) -> list[SolicitudCiudadanoRespuesta]:
+    return solicitudes_service.listar_mias(usuario.id_usuario)
 
 
 @router.get(

@@ -1,0 +1,156 @@
+<div class="container py-4 py-lg-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="text-center mb-4">
+        <span class="icon-circle mx-auto mb-3"><i class="bi bi-search"></i></span>
+        <h1 class="h3">Consulta la trazabilidad de tu equipo</h1>
+        <p class="text-muted-soft mb-0">
+          Ingresa el código de seguimiento para conocer el estado y el historial
+          de tu RAEE.
+        </p>
+      </div>
+
+      <div class="card card-raee mb-4">
+        <div class="card-body p-4">
+          <form [formRoot]="formulario" novalidate>
+            <label class="form-label" for="codigo">Código de seguimiento</label>
+            <div class="input-group input-group-lg">
+              <span class="input-group-text bg-white"><i class="bi bi-upc-scan"></i></span>
+              <input
+                id="codigo"
+                type="text"
+                class="form-control text-uppercase"
+                placeholder="RAEE-2026-0001"
+                autocomplete="off"
+                [formField]="formulario.codigo"
+              />
+              <button class="btn btn-raee" type="submit" [disabled]="cargando()">
+                @if (cargando()) {
+                  <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                } @else {
+                  <i class="bi bi-search me-1"></i>
+                }
+                Consultar
+              </button>
+            </div>
+
+            @if (formulario.codigo().touched() && formulario.codigo().invalid()) {
+              <div class="invalid-feedback d-block">
+                {{ formulario.codigo().errors()[0]?.message }}
+              </div>
+            }
+
+            <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
+              <span class="small text-muted-soft">Ejemplo:</span>
+              <button type="button" class="btn btn-sm btn-outline-secondary codigo-chip" (click)="usarEjemplo('RAEE-2026-0001')">
+                RAEE-2026-0001
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      @if (cargando()) {
+        <app-loading texto="Buscando el equipo en el sistema..." />
+      }
+
+      @if (error(); as mensaje) {
+        <div class="alert alert-danger d-flex align-items-start gap-2" role="alert">
+          <i class="bi bi-exclamation-octagon-fill"></i>
+          <div class="flex-grow-1">{{ mensaje }}</div>
+          <button type="button" class="btn btn-sm btn-outline-danger" (click)="buscar()">
+            Reintentar
+          </button>
+        </div>
+      }
+
+      @if (noEncontrado()) {
+        <div class="card card-raee">
+          <app-empty-state
+            titulo="No encontramos un equipo con ese código"
+            mensaje="Verifica que el código esté completo. Tiene el formato RAEE-AAAA-0000."
+            icono="bi-search"
+          >
+            <a class="btn btn-outline-raee" routerLink="/centros">Ver centros de acopio</a>
+          </app-empty-state>
+        </div>
+      }
+
+      @if (resultado(); as rastreo) {
+        <div class="card card-raee mb-4 fade-in">
+          <div class="card-body p-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+              <div>
+                <span class="text-muted-soft small text-uppercase">Código de seguimiento</span>
+                <div class="d-flex align-items-center gap-2 mt-1">
+                  <span class="codigo-chip fs-5">{{ rastreo.ficha.codigo_seguimiento }}</span>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    (click)="copiar(rastreo.ficha.codigo_seguimiento)"
+                    aria-label="Copiar código de seguimiento"
+                  >
+                    <i class="bi bi-clipboard"></i>
+                  </button>
+                </div>
+              </div>
+              <app-estado-badge [estado]="rastreo.ficha.estado_actual" tipo="raee" />
+            </div>
+
+            <div class="row g-3">
+              <div class="col-sm-6">
+                <div class="small text-muted-soft">Categoría</div>
+                <div class="fw-semibold">{{ rastreo.ficha.categoria }}</div>
+              </div>
+              <div class="col-sm-6">
+                <div class="small text-muted-soft">Marca y modelo</div>
+                <div class="fw-semibold">
+                  {{ rastreo.ficha.marca || '—' }} {{ rastreo.ficha.modelo || '' }}
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="small text-muted-soft">Fecha de registro</div>
+                <div class="fw-semibold">{{ rastreo.ficha.fecha_registro | fechaHora }}</div>
+              </div>
+              <div class="col-sm-6">
+                <div class="small text-muted-soft">Peso registrado</div>
+                <div class="fw-semibold">{{ rastreo.ficha.peso_kg | pesoKg }}</div>
+              </div>
+              <div class="col-sm-6">
+                <div class="small text-muted-soft">Destino final</div>
+                <div class="fw-semibold">{{ rastreo.ficha.destino_final || 'Pendiente de evaluación' }}</div>
+              </div>
+              <div class="col-sm-6">
+                <div class="small text-muted-soft">Valorización</div>
+                @if (rastreo.ficha.es_valorizacion === null) {
+                  <div class="fw-semibold">Pendiente de evaluación</div>
+                } @else if (rastreo.ficha.es_valorizacion) {
+                  <span class="badge text-bg-success"><i class="bi bi-arrow-repeat me-1"></i>Valorizable</span>
+                } @else {
+                  <span class="badge text-bg-secondary"><i class="bi bi-trash3 me-1"></i>Disposición final</span>
+                }
+              </div>
+              @if (rastreo.ficha.descripcion) {
+                <div class="col-12">
+                  <div class="small text-muted-soft">Descripción</div>
+                  <p class="mb-0">{{ rastreo.ficha.descripcion }}</p>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="card card-raee">
+          <div class="card-body p-4">
+            <h2 class="h5 mb-3"><i class="bi bi-clock-history me-2 text-raee"></i>Historial de trazabilidad</h2>
+            @if (rastreo.historial.length > 0) {
+              <app-timeline [eventos]="rastreo.historial" />
+            } @else {
+              <p class="text-muted-soft mb-0">Todavía no hay movimientos registrados.</p>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -22,6 +22,15 @@ class SolicitudCreadaRespuesta(BaseModel):
     id_solicitud: int = Field(..., examples=[3])
 
 
+class SolicitudCiudadanoRespuesta(BaseModel):
+    id_solicitud: int = Field(..., examples=[3])
+    id_raee: int = Field(..., examples=[3])
+    codigo_seguimiento: str = Field(..., examples=["RAEE-2026-0003"])
+    tipo_solicitud: str = Field(..., examples=["PRESENCIAL"])
+    fecha_programada: datetime = Field(..., examples=["2026-12-01T10:30:00-05:00"])
+    estado_solicitud: str = Field(..., examples=["PENDIENTE"])
+
+
 class SolicitudCentroRespuesta(BaseModel):
     id_solicitud: int = Field(..., examples=[3])
     id_raee: int = Field(..., examples=[3])

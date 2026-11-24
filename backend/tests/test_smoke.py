@@ -1,15 +1,19 @@
 """Pruebas de humo offline: no requieren conexión a Supabase."""
 
+from datetime import datetime, timezone
+
 import pytest
 from fastapi.testclient import TestClient
 
 from backend.main import app
+from backend.schemas.solicitudes import SolicitudCiudadanoRespuesta
 from backend.security import (
     crear_token_acceso,
     decodificar_token,
     hash_password,
     verificar_password,
 )
+from backend.services import solicitudes_service
 
 cliente = TestClient(app)
 
@@ -41,6 +45,7 @@ def test_documentacion_swagger_disponible() -> None:
         ("POST", "/api/raee"),
         ("GET", "/api/raee/mios"),
         ("POST", "/api/solicitudes"),
+        ("GET", "/api/solicitudes/mias"),
         ("PATCH", "/api/solicitudes/1/cancelar"),
         ("GET", "/api/solicitudes/centro"),
         ("PATCH", "/api/solicitudes/1/recepcionar"),
@@ -105,3 +110,75 @@ def test_jwt_ida_y_vuelta() -> None:
     assert payload["rol"] == "CIUDADANO"
     assert payload["id_centro"] is None
     assert expira_minutos == 60
+
+
+def _token_de_prueba(rol: str, id_usuario: int = 4) -> str:
+    token, _ = crear_token_acceso(
+        id_usuario=id_usuario,
+        correo="prueba@raeehuancayo.pe",
+        rol=rol,
+        id_centro=None,
+    )
+    return token
+
+
+def test_listar_mias_mapea_las_filas_del_repositorio(monkeypatch) -> None:
+    fila = {
+        "id_solicitud": 7,
+        "id_raee": 3,
+        "codigo_seguimiento": "RAEE-2026-0003",
+        "tipo_solicitud": "PRESENCIAL",
+        "fecha_programada": datetime(2026, 12, 1, 10, 30, tzinfo=timezone.utc),
+        "estado_solicitud": "PENDIENTE",
+    }
+    monkeypatch.setattr(
+        solicitudes_service.solicitud_repositorio,
+        "listar_por_usuario",
+        lambda id_usuario: [fila],
+    )
+
+    resultado = solicitudes_service.listar_mias(4)
+
+    assert len(resultado) == 1
+    assert resultado[0].id_solicitud == 7
+    assert resultado[0].codigo_seguimiento == "RAEE-2026-0003"
+    assert resultado[0].estado_solicitud == "PENDIENTE"
+
+
+def test_listar_mias_responde_al_ciudadano(monkeypatch) -> None:
+    monkeypatch.setattr(
+        solicitudes_service,
+        "listar_mias",
+        lambda id_usuario: [
+            SolicitudCiudadanoRespuesta(
+                id_solicitud=7,
+                id_raee=3,
+                codigo_seguimiento="RAEE-2026-0003",
+                tipo_solicitud="RECOLECCION",
+                fecha_programada=datetime(
+                    2026, 12, 1, 10, 30, tzinfo=timezone.utc
+                ),
+                estado_solicitud="PENDIENTE",
+            )
+        ],
+    )
+
+    respuesta = cliente.get(
+        "/api/solicitudes/mias",
+        headers={"Authorization": f"Bearer {_token_de_prueba('CIUDADANO')}"},
+    )
+
+    assert respuesta.status_code == 200
+    cuerpo = respuesta.json()
+    assert cuerpo[0]["codigo_seguimiento"] == "RAEE-2026-0003"
+    assert cuerpo[0]["tipo_solicitud"] == "RECOLECCION"
+
+
+def test_listar_mias_rechaza_roles_distintos_de_ciudadano() -> None:
+    respuesta = cliente.get(
+        "/api/solicitudes/mias",
+        headers={"Authorization": f"Bearer {_token_de_prueba('ENCARGADO')}"},
+    )
+
+    assert respuesta.status_code == 403
+

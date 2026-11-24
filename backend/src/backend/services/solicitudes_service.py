@@ -5,6 +5,7 @@ from ..repositories import solicitud_repositorio
 from ..schemas.solicitudes import (
     OperacionRespuesta,
     SolicitudCentroRespuesta,
+    SolicitudCiudadanoRespuesta,
     SolicitudCreadaRespuesta,
     SolicitudCrearRequest,
 )
@@ -23,6 +24,13 @@ def crear(
         fecha_programada=datos.fecha_programada,
     )
     return SolicitudCreadaRespuesta(id_solicitud=id_solicitud)
+
+
+def listar_mias(id_usuario: int) -> list[SolicitudCiudadanoRespuesta]:
+    return [
+        SolicitudCiudadanoRespuesta.model_validate(fila)
+        for fila in solicitud_repositorio.listar_por_usuario(id_usuario)
+    ]
 
 
 def cancelar(id_solicitud: int, id_usuario: int) -> OperacionRespuesta:

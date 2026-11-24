@@ -1,0 +1,176 @@
+<section class="hero py-5">
+  <div class="container py-lg-4">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-7">
+        <span class="hero-badge mb-3">
+          <i class="bi bi-leaf"></i>Gestión responsable de RAEE
+        </span>
+        <h1 class="display-5 fw-bold mb-3">
+          Dale una segunda vida a tus aparatos electrónicos
+        </h1>
+        <p class="lead mb-4 text-white-50">
+          Registra tus residuos de aparatos eléctricos y electrónicos, programa
+          la entrega en un centro de acopio y sigue todo el proceso hasta su
+          disposición final.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <a class="btn btn-light btn-lg text-raee fw-semibold" routerLink="/registro">
+            <i class="bi bi-person-plus me-1"></i>Registrar mi equipo
+          </a>
+          <a class="btn btn-outline-light btn-lg" routerLink="/centros">
+            <i class="bi bi-geo-alt me-1"></i>Ver centros de acopio
+          </a>
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="card border-0 shadow-lg rounded-4">
+          <div class="card-body p-4">
+            <h2 class="h5 mb-1">Consulta tu equipo</h2>
+            <p class="text-muted-soft small mb-3">
+              Ingresa el código de seguimiento que recibiste al registrarlo.
+            </p>
+            <div class="input-group input-group-lg mb-2">
+              <span class="input-group-text bg-white"><i class="bi bi-upc-scan"></i></span>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="RAEE-2026-0001"
+                aria-label="Código de seguimiento"
+                [ngModel]="codigo()"
+                (ngModelChange)="codigo.set($event)"
+                (keyup.enter)="buscar()"
+              />
+            </div>
+            <button type="button" class="btn btn-raee w-100 btn-lg" (click)="buscar()">
+              <i class="bi bi-search me-1"></i>Consultar trazabilidad
+            </button>
+            <p class="small text-muted-soft mt-3 mb-0">
+              <i class="bi bi-shield-check me-1"></i>
+              La consulta pública no muestra datos personales.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container py-4">
+  <div class="row g-3">
+    <div class="col-6 col-lg-3">
+      <div class="stat-card h-100">
+        <div class="stat-value text-raee">{{ categorias.value().length }}</div>
+        <div class="stat-label">Categorías de RAEE</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="stat-card h-100">
+        <div class="stat-value text-raee">{{ centros.value().length }}</div>
+        <div class="stat-label">Centros activos</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="stat-card h-100">
+        <div class="stat-value text-raee">{{ distritos.value().length }}</div>
+        <div class="stat-label">Distritos atendidos</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="stat-card h-100">
+        <div class="stat-value text-raee">4</div>
+        <div class="stat-label">Estados de trazabilidad</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container py-4">
+  <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+    <div>
+      <h2 class="section-title mb-1">¿Cómo funciona?</h2>
+      <p class="text-muted-soft mb-0">Cuatro pasos para una entrega segura y trazable.</p>
+    </div>
+    <a class="btn btn-outline-raee" routerLink="/rastreo">
+      <i class="bi bi-search me-1"></i>Consultar un código
+    </a>
+  </div>
+
+  <div class="row g-3">
+    @for (paso of pasos; track paso.titulo; let indice = $index) {
+      <div class="col-md-6 col-xl-3">
+        <div class="card card-raee card-raee-hover h-100">
+          <div class="card-body p-4">
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <span class="step-number">{{ indice + 1 }}</span>
+              <i [class]="'bi fs-4 text-raee ' + paso.icono"></i>
+            </div>
+            <h3 class="h6">{{ paso.titulo }}</h3>
+            <p class="text-muted-soft small mb-0">{{ paso.texto }}</p>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</section>
+
+<section class="container py-4">
+  <div class="row g-4 align-items-center">
+    <div class="col-lg-5">
+      <h2 class="section-title mb-2">Categorías que recibimos</h2>
+      <p class="text-muted-soft">
+        Aceptamos equipos eléctricos y electrónicos de uso doméstico. Si tienes
+        dudas sobre una categoría, consulta en el centro de acopio más cercano.
+      </p>
+      <a class="btn btn-raee" routerLink="/centros">
+        <i class="bi bi-geo-alt me-1"></i>Buscar un centro
+      </a>
+    </div>
+    <div class="col-lg-7">
+      <div class="row g-3">
+        @for (categoria of categorias.value(); track categoria.id_categoria) {
+          <div class="col-sm-6">
+            <div class="card card-raee h-100">
+              <div class="card-body">
+                <div class="icon-circle mb-2"><i class="bi bi-cpu"></i></div>
+                <h3 class="h6 mb-1">{{ categoria.nombre }}</h3>
+                <p class="small text-muted-soft mb-0">
+                  {{ categoria.descripcion || 'Categoría de RAEE aceptada.' }}
+                </p>
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <div class="col-12">
+            <div class="alert alert-light border mb-0">
+              <i class="bi bi-info-circle me-1"></i>
+              Las categorías se mostrarán cuando la API esté disponible.
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container py-4">
+  <div class="card card-raee bg-raee-suave border-0">
+    <div class="card-body p-4 p-lg-5">
+      <div class="row g-4 align-items-center">
+        <div class="col-lg-8">
+          <h2 class="h3 mb-2">Un proceso trazable de principio a fin</h2>
+          <p class="text-muted-soft mb-0">
+            Cada equipo recibe un código único. Desde el registro hasta la
+            evaluación técnica, el historial queda disponible para el ciudadano
+            y para la municipalidad.
+          </p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+          <a class="btn btn-raee btn-lg" routerLink="/login">
+            <i class="bi bi-box-arrow-in-right me-1"></i>Ingresar al sistema
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
