@@ -1,4 +1,4 @@
 export const environment = {
   produccion: true,
-  apiUrl: 'http://localhost:8000/api',
+  apiUrl: 'https://sistema-trazabilidad-raee.onrender.com/api',
 };
