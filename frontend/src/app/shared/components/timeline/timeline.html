@@ -1,0 +1,27 @@
+<ol class="timeline">
+  @for (evento of eventosOrdenados(); track evento.id_historial) {
+    <li class="timeline-item">
+      <span [class]="clasePunto(evento.estado_nuevo)">
+        <i [class]="'bi ' + icono(evento.estado_nuevo)"></i>
+      </span>
+
+      <div class="d-flex flex-wrap gap-2 align-items-center">
+        <app-estado-badge [estado]="evento.estado_nuevo" tipo="raee" />
+        @if (evento.estado_anterior) {
+          <span class="text-muted-soft small">
+            <i class="bi bi-arrow-right me-1"></i>desde
+            {{ evento.estado_anterior }}
+          </span>
+        }
+      </div>
+
+      @if (evento.comentario) {
+        <p class="mb-1 mt-2">{{ evento.comentario }}</p>
+      }
+
+      <span class="timeline-fecha">
+        <i class="bi bi-clock me-1"></i>{{ evento.fecha_cambio | fechaHora }}
+      </span>
+    </li>
+  }
+</ol>

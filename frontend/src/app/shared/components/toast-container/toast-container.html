@@ -1,0 +1,20 @@
+<div class="toast-container-raee" aria-live="polite" aria-atomic="true">
+  @for (item of notificacion.notificaciones(); track item.id) {
+    <div
+      class="toast show toast-raee border-start border-4"
+      [class]="'toast show toast-raee border-start border-4 ' + borde(item.tipo)"
+      role="alert"
+    >
+      <div class="toast-body d-flex align-items-start gap-2 py-3">
+        <i [class]="'bi fs-5 ' + icono(item.tipo)"></i>
+        <div class="flex-grow-1">{{ item.mensaje }}</div>
+        <button
+          type="button"
+          class="btn-close ms-1"
+          (click)="notificacion.cerrar(item.id)"
+          aria-label="Cerrar notificación"
+        ></button>
+      </div>
+    </div>
+  }
+</div>

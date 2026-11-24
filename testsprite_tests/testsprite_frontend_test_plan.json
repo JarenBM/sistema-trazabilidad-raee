@@ -1,0 +1,1356 @@
+[
+  {
+    "id": "TC001",
+    "title": "Registrar un ciudadano con datos válidos",
+    "description": "Este test verifica que una persona puede registrarse correctamente como ciudadano y recibir una cuenta activa.",
+    "category": "Authentication and Session",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the registration form with valid citizen details"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the citizen account is created"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the account is shown as active"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Iniciar sesión y ver el perfil autenticado",
+    "description": "Este test verifica que un usuario registrado puede iniciar sesión y acceder a su perfil autenticado.",
+    "category": "Authentication and Session",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the authenticated profile view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the authenticated user profile is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user is recognized as logged in"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Verificar que el sistema responde y muestra el estado de base de datos",
+    "description": "Este test verifica que la verificación de salud del sistema devuelve un estado operativo de la API y de la base de datos.",
+    "category": "Health Check",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /api/health"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the API health status is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the database health status is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Register a RAEE device",
+    "description": "A citizen can create a RAEE record and receive a tracking code for the new device.",
+    "category": "RAEE Devices",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the RAEE registration page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the category field with a valid category"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the brand field with a valid brand"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the model field with a valid model"
+      },
+      {
+        "type": "action",
+        "description": "Submit the RAEE registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new RAEE record is created"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a tracking code is displayed for the new record"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Publicly track a RAEE by code",
+    "description": "A public user can look up a RAEE with a valid tracking code and see its public ficha and history without personal data.",
+    "category": "Public Tracking",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the public tracking page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a valid tracking code"
+      },
+      {
+        "type": "action",
+        "description": "Submit the tracking search"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the public RAEE ficha is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the tracking history is displayed without personal data"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Create a delivery request for a RAEE device",
+    "description": "A citizen can request either delivery or pickup for one of their registered RAEE devices and the request is created successfully.",
+    "category": "Delivery Requests",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the delivery request creation page"
+      },
+      {
+        "type": "action",
+        "description": "Select one of the citizen's registered RAEE devices"
+      },
+      {
+        "type": "action",
+        "description": "Select an active collection center"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid request type"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid scheduled date and time"
+      },
+      {
+        "type": "action",
+        "description": "Submit the delivery request form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the delivery request is created"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the request appears in the user's request history or confirmation view"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Rechazar el inicio de sesión con credenciales inválidas",
+    "description": "Este test verifica que el sistema no permite iniciar sesión con correo o contraseña incorrectos.",
+    "category": "Authentication and Session",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with invalid values"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an authentication error is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "Record a technical evaluation for a received RAEE",
+    "description": "An assigned center worker can register a technical evaluation for a received RAEE and assign its environmental destination.",
+    "category": "Technical Evaluation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the technical evaluation page"
+      },
+      {
+        "type": "action",
+        "description": "Select a received RAEE"
+      },
+      {
+        "type": "action",
+        "description": "Select a destination type"
+      },
+      {
+        "type": "action",
+        "description": "Select a physical condition"
+      },
+      {
+        "type": "action",
+        "description": "Select whether the device is operational"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a valid weight value"
+      },
+      {
+        "type": "action",
+        "description": "Submit the evaluation form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the evaluation is created"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the RAEE is marked as evaluated"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Receive a pending delivery request at the center",
+    "description": "An assigned center worker can mark a pending request as received and the request changes to completed.",
+    "category": "Delivery Requests",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the center request queue"
+      },
+      {
+        "type": "action",
+        "description": "Open a pending request"
+      },
+      {
+        "type": "action",
+        "description": "Mark the request as received"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the request is marked as completed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the device is marked as received"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "Consultar resumen global de reportes como administrador",
+    "description": "Verifies that an administrator can access the global reports summary and see the management totals and weight indicators.",
+    "category": "Reports",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to the reports summary"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the global reports summary is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify totals and weight indicators are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC011",
+    "title": "Rechazar el registro con correo duplicado",
+    "description": "Este test verifica que el sistema impide crear una cuenta ciudadana con un correo ya registrado.",
+    "category": "Authentication and Session",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the registration form with a new citizen and an email already used earlier in the test"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a duplicate registration error is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC012",
+    "title": "Bloquear el acceso administrativo a un usuario no administrador",
+    "description": "Este test verifica que un usuario sin permisos de administración no puede acceder a las funciones de administración de usuarios.",
+    "category": "User Administration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} for a non-admin user"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the user administration view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a forbidden access message is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC013",
+    "title": "Create a collection center as an administrator",
+    "description": "An administrator can create a new collection center with valid data and see the center created.",
+    "category": "Collection Center Administration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /centros"
+      },
+      {
+        "type": "action",
+        "description": "Open the new center form"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the center name with a unique value"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the address field with a valid address"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the district code field with a valid ubigeo"
+      },
+      {
+        "type": "action",
+        "description": "Submit the center form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new collection center is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC014",
+    "title": "Deactivate a collection center as an administrator",
+    "description": "An administrator can deactivate an existing collection center and see it marked inactive.",
+    "category": "Collection Center Administration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /centros"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing collection center"
+      },
+      {
+        "type": "action",
+        "description": "Change the center status to inactive"
+      },
+      {
+        "type": "action",
+        "description": "Save the center status"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the center is shown as inactive"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC015",
+    "title": "List only my RAEE devices",
+    "description": "A citizen can open their RAEE list and see only their own registered devices with their current status information.",
+    "category": "RAEE Devices",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the citizen RAEE list page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the citizen's RAEE records are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify each displayed record belongs to the logged-in citizen"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC016",
+    "title": "Verificar que un administrador puede listar usuarios",
+    "description": "Este test verifica que un administrador autenticado puede acceder al listado completo de usuarios del sistema.",
+    "category": "User Administration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} for an administrator"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the user administration view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user list is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify multiple users are visible in the list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC017",
+    "title": "View and filter center requests by status",
+    "description": "An assigned center worker can open the request queue and filter requests by status, including an empty result for an unsupported status filter value.",
+    "category": "Delivery Requests",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the center request queue"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid request status filter"
+      },
+      {
+        "type": "action",
+        "description": "Verify matching requests are displayed"
+      },
+      {
+        "type": "action",
+        "description": "Select an invalid request status filter value"
+      },
+      {
+        "type": "action",
+        "description": "Verify an empty result is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC018",
+    "title": "Crear un usuario encargado asignado a un centro",
+    "description": "Este test verifica que un administrador puede crear un encargado y asignarlo correctamente a un centro de acopio.",
+    "category": "User Administration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} for an administrator"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the create user flow for an assigned manager"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the new manager form with valid data and a selected center"
+      },
+      {
+        "type": "action",
+        "description": "Submit the new manager form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new manager account is created"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the manager is assigned to a center"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC019",
+    "title": "Admin manages active users and collection centers",
+    "description": "An administrator can view users and centers, create or activate entries, and toggle their active status from the admin area.",
+    "category": "Municipal Administration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the administration users page"
+      },
+      {
+        "type": "action",
+        "description": "Create or open a user record"
+      },
+      {
+        "type": "action",
+        "description": "Toggle the user's active status"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the administration centers page"
+      },
+      {
+        "type": "action",
+        "description": "Create or open a center record"
+      },
+      {
+        "type": "action",
+        "description": "Toggle the center's active status"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated user and center records are displayed in their new state"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC020",
+    "title": "Restringir el resumen de reportes a usuarios sin permiso",
+    "description": "Verifies that a non-admin user cannot access the global reports summary and is shown a forbidden response or access denied state.",
+    "category": "Reports",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to the reports summary"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify access to the reports summary is denied"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a forbidden message is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC021",
+    "title": "Prevent duplicate delivery requests for the same RAEE",
+    "description": "A citizen is blocked from creating a second pending request for a device that already has one.",
+    "category": "Delivery Requests",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the delivery request creation page"
+      },
+      {
+        "type": "action",
+        "description": "Select one of the citizen's registered RAEE devices"
+      },
+      {
+        "type": "action",
+        "description": "Select an active collection center"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid request type"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid scheduled date and time"
+      },
+      {
+        "type": "action",
+        "description": "Submit the delivery request form"
+      },
+      {
+        "type": "action",
+        "description": "Open the delivery request form again for the same device"
+      },
+      {
+        "type": "action",
+        "description": "Submit the delivery request form again"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a duplicate-request validation message is shown"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC022",
+    "title": "Desactivar una cuenta de usuario desde administración",
+    "description": "Este test verifica que un administrador puede desactivar una cuenta existente.",
+    "category": "User Administration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} for an administrator"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the user administration view"
+      },
+      {
+        "type": "action",
+        "description": "Select an existing user account"
+      },
+      {
+        "type": "action",
+        "description": "Change the user account status to inactive"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user account is shown as inactive"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC023",
+    "title": "Admin reviews the global report summary",
+    "description": "An administrator can open the reports area and view the global summary of RAEE management activity.",
+    "category": "Municipal Administration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the reports summary page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the global report summary is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify aggregated management metrics are visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC024",
+    "title": "Prevent a non-admin from creating collection centers",
+    "description": "A non-admin authenticated user cannot create collection centers and sees authorization feedback.",
+    "category": "Collection Center Administration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /centros"
+      },
+      {
+        "type": "action",
+        "description": "Open the new center form"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the center name with a unique value"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the address field with a valid address"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the district code field with a valid ubigeo"
+      },
+      {
+        "type": "action",
+        "description": "Submit the center form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an authorization error is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC025",
+    "title": "Cancel a pending delivery request",
+    "description": "A citizen can cancel a pending delivery request and the request is removed from the pending state.",
+    "category": "Delivery Requests",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the citizen request history page"
+      },
+      {
+        "type": "action",
+        "description": "Open a pending delivery request"
+      },
+      {
+        "type": "action",
+        "description": "Cancel the request"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the request is no longer pending"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the cancellation is reflected in the request history"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC026",
+    "title": "Ver resumen global sin equipos evaluados",
+    "description": "Verifies that the administrator can open the reports summary even before evaluations exist and sees zeroed or near-zero management metrics.",
+    "category": "Reports",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to the reports summary"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the reports summary is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the summary metrics are zeroed or near-zero"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC027",
+    "title": "Track a RAEE publicly regardless of code casing",
+    "description": "A public user gets the same tracking result when entering the same tracking code with different letter casing.",
+    "category": "Public Tracking",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /publico/rastreo"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a valid tracking code into the tracking code field using mixed casing"
+      },
+      {
+        "type": "action",
+        "description": "Submit the tracking lookup"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify public device data is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a history timeline is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC028",
+    "title": "Register a RAEE with invalid data",
+    "description": "A citizen sees validation feedback when trying to submit a RAEE record with invalid required fields or an invalid category.",
+    "category": "RAEE Devices",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the RAEE registration page"
+      },
+      {
+        "type": "action",
+        "description": "Leave the required fields empty"
+      },
+      {
+        "type": "action",
+        "description": "Submit the RAEE registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify validation errors are shown for the invalid RAEE data"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC029",
+    "title": "Show only active collection centers by default",
+    "description": "A public user can retrieve the active collection center catalog and see only active centers by default.",
+    "category": "Catalogs",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /api/catalogos/centros"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify active collection center data is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC030",
+    "title": "Block invalid technical evaluation data",
+    "description": "An assigned center worker sees validation feedback when required evaluation fields are missing or the weight value is invalid.",
+    "category": "Technical Evaluation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the technical evaluation page"
+      },
+      {
+        "type": "action",
+        "description": "Select a received RAEE"
+      },
+      {
+        "type": "action",
+        "description": "Leave the destination field empty"
+      },
+      {
+        "type": "action",
+        "description": "Fill in an invalid weight value"
+      },
+      {
+        "type": "action",
+        "description": "Submit the evaluation form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify validation errors are shown for the invalid evaluation data"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC031",
+    "title": "Rechazar el envío de inicio de sesión en formato incorrecto",
+    "description": "Este test verifica que el inicio de sesión falla cuando se envían credenciales en un formato no admitido por la interfaz.",
+    "category": "Authentication and Session",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials using the unsupported request format"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a validation error is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC032",
+    "title": "Include inactive collection centers when requested",
+    "description": "A public user can retrieve the collection center catalog including inactive centers when explicitly requested.",
+    "category": "Catalogs",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /api/catalogos/centros?solo_activos=false"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify collection center data is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC033",
+    "title": "List available districts",
+    "description": "A public user can retrieve the district catalog and see it populated with districts.",
+    "category": "Catalogs",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /api/catalogos/distritos"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify district data is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC034",
+    "title": "List RAEE categories",
+    "description": "A public user can retrieve the RAEE category catalog and see it populated with categories.",
+    "category": "Catalogs",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /api/catalogos/categorias"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify RAEE category data is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC035",
+    "title": "List environmental destination types",
+    "description": "A public user can retrieve the environmental destination type catalog and see it populated with destination types.",
+    "category": "Catalogs",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /api/catalogos/tipos-destino"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify environmental destination type data is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC036",
+    "title": "Reject an invalid public tracking code",
+    "description": "A public user gets an empty or error state when searching with an invalid or incorrectly cased tracking code.",
+    "category": "Public Tracking",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the public tracking page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in an invalid tracking code"
+      },
+      {
+        "type": "action",
+        "description": "Submit the tracking search"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an empty or not-found state is displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC037",
+    "title": "Show not found feedback for an unknown tracking code",
+    "description": "A public user sees a not found result when searching for a tracking code that does not exist.",
+    "category": "Public Tracking",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /publico/rastreo"
+      },
+      {
+        "type": "action",
+        "description": "Fill in an unknown tracking code into the tracking code field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the tracking lookup"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a not found message is displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC038",
+    "title": "Handle malformed collection center catalog query",
+    "description": "A public user sees validation feedback when the collection center catalog is requested with malformed query parameters.",
+    "category": "Catalogs",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /api/catalogos/centros?solo_activos=not-a-boolean"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a validation error is displayed"
+      }
+    ],
+    "priority": "Low"
+  }
+]

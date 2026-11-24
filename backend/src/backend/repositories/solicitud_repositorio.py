@@ -47,6 +47,18 @@ def cancelar(id_solicitud: int, id_usuario: int) -> bool:
     return bool(fila and fila["resultado"])
 
 
+def listar_por_usuario(id_usuario: int) -> list[dict]:
+    try:
+        with obtener_conexion() as conexion, conexion.cursor() as cursor:
+            cursor.execute(
+                "SELECT * FROM fn_solicitudes_listar_por_usuario(%s)",
+                (id_usuario,),
+            )
+            return cursor.fetchall()
+    except psycopg.Error as exc:
+        traducir_error_bd(exc)
+
+
 def listar_por_centro(id_centro: int, estado: str | None) -> list[dict]:
     try:
         with obtener_conexion() as conexion, conexion.cursor() as cursor:

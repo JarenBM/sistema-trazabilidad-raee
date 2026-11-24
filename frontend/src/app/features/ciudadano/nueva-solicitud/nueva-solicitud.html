@@ -1,0 +1,249 @@
+<div class="container py-4">
+  <app-page-header
+    titulo="Programar entrega"
+    subtitulo="Elige cómo y cuándo entregarás tu equipo en el centro de acopio."
+    icono="bi-calendar-check"
+    volver="/ciudadano"
+  />
+
+  @if (creada(); as solicitud) {
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+        <div class="card card-raee">
+          <div class="card-body p-4 p-lg-5 text-center">
+            <span class="icon-circle mx-auto mb-3"><i class="bi bi-calendar-check"></i></span>
+            <h2 class="h4 mb-2">Solicitud programada</h2>
+            <p class="text-muted-soft mb-4">
+              El centro de acopio revisará tu solicitud. Acércate con el equipo y tu
+              código de seguimiento el día indicado.
+            </p>
+
+            <div class="text-start bg-raee-suave rounded-3 p-3 mb-4">
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted-soft small">Código de seguimiento</span>
+                <span class="codigo-chip">{{ solicitud.codigo }}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted-soft small">Centro de acopio</span>
+                <span class="fw-semibold text-end">{{ solicitud.centro }}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted-soft small">Modalidad</span>
+                <span class="fw-semibold">{{ solicitud.tipo }}</span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span class="text-muted-soft small">Fecha programada</span>
+                <span class="fw-semibold">{{ solicitud.fecha | fechaHora }}</span>
+              </div>
+            </div>
+
+            <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
+              <a class="btn btn-raee" routerLink="/ciudadano">
+                <i class="bi bi-list-check me-1"></i>Ver mis equipos
+              </a>
+              <a
+                class="btn btn-outline-raee"
+                routerLink="/rastreo"
+                [queryParams]="{ codigo: solicitud.codigo }"
+              >
+                <i class="bi bi-search me-1"></i>Ver trazabilidad
+              </a>
+              @if (solicitudPendiente(); as pendiente) {
+                <button
+                  class="btn btn-outline-danger"
+                  type="button"
+                  [disabled]="cancelando()"
+                  (click)="cancelar(pendiente)"
+                >
+                  @if (cancelando()) {
+                    <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                  } @else {
+                    <i class="bi bi-x-circle me-1"></i>
+                  }
+                  Cancelar solicitud
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  } @else if (dispositivos.isLoading()) {
+    <app-loading texto="Cargando la información del equipo..." />
+  } @else if (!dispositivo()) {
+    <div class="card card-raee">
+      <app-empty-state
+        titulo="No encontramos ese equipo"
+        mensaje="Puede que el equipo no pertenezca a tu cuenta o haya sido eliminado."
+        icono="bi-pc-display"
+      >
+        <a class="btn btn-raee" routerLink="/ciudadano">Volver a mis equipos</a>
+      </app-empty-state>
+    </div>
+  } @else if (dispositivo()!.estado_actual !== 'REGISTRADO') {
+    <div class="card card-raee">
+      <div class="card-body p-4 p-lg-5 text-center">
+        <span class="icon-circle mx-auto mb-3"><i class="bi bi-info-circle"></i></span>
+        <h2 class="h5">Este equipo ya tiene un proceso en curso</h2>
+        <p class="text-muted-soft mb-1">
+          Código: <span class="codigo-chip">{{ dispositivo()!.codigo_seguimiento }}</span>
+        </p>
+        <div class="mb-4">
+          Estado actual:
+          <app-estado-badge [estado]="dispositivo()!.estado_actual" tipo="raee" />
+        </div>
+
+        <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
+          @if (solicitudPendiente(); as pendiente) {
+            <button
+              class="btn btn-outline-danger"
+              type="button"
+              [disabled]="cancelando()"
+              (click)="cancelar(pendiente)"
+            >
+              <i class="bi bi-x-circle me-1"></i>Cancelar solicitud
+            </button>
+          }
+          <a class="btn btn-raee" routerLink="/ciudadano">Volver a mis equipos</a>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <div class="card card-raee">
+          <div class="card-body p-4 p-lg-5">
+            @if (error(); as mensaje) {
+              <div class="alert alert-danger d-flex align-items-start gap-2" role="alert">
+                <i class="bi bi-exclamation-octagon-fill"></i>
+                <span>{{ mensaje }}</span>
+              </div>
+            }
+
+            <form [formRoot]="formulario" novalidate>
+              <div class="mb-3">
+                <label class="form-label" for="centro">Centro de acopio</label>
+                <select id="centro" class="form-select" [formField]="formulario.idCentro">
+                  <option value="">Selecciona un centro</option>
+                  @for (centro of centros.value(); track centro.id_centro) {
+                    <option [value]="centro.id_centro">
+                      {{ centro.nombre_centro }} — {{ centro.distrito }}
+                    </option>
+                  }
+                </select>
+                @if (formulario.idCentro().touched() && formulario.idCentro().invalid()) {
+                  <div class="invalid-feedback d-block">
+                    {{ formulario.idCentro().errors()[0]?.message }}
+                  </div>
+                }
+              </div>
+
+              <fieldset class="mb-3">
+                <legend class="form-label fs-6">Modalidad de entrega</legend>
+                <div class="d-flex flex-column flex-sm-row gap-2">
+                  <label class="card-raee p-3 flex-fill mb-0" style="cursor: pointer">
+                    <input
+                      type="radio"
+                      class="form-check-input me-2"
+                      value="PRESENCIAL"
+                      [formField]="formulario.tipoSolicitud"
+                    />
+                    <span class="fw-semibold">Entrega presencial</span>
+                    <span class="d-block small text-muted-soft">
+                      Llevas el equipo al centro de acopio.
+                    </span>
+                  </label>
+                  <label class="card-raee p-3 flex-fill mb-0" style="cursor: pointer">
+                    <input
+                      type="radio"
+                      class="form-check-input me-2"
+                      value="RECOLECCION"
+                      [formField]="formulario.tipoSolicitud"
+                    />
+                    <span class="fw-semibold">Recolección</span>
+                    <span class="d-block small text-muted-soft">
+                      El centro coordina la recolección.
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <div class="mb-3">
+                <label class="form-label" for="fecha">Fecha y hora de entrega</label>
+                <input
+                  id="fecha"
+                  type="datetime-local"
+                  class="form-control"
+                  [formField]="formulario.fecha"
+                />
+                @if (formulario.fecha().touched() && formulario.fecha().invalid()) {
+                  <div class="invalid-feedback d-block">
+                    {{ formulario.fecha().errors()[0]?.message }}
+                  </div>
+                }
+              </div>
+
+              @if (centroSeleccionado(); as centro) {
+                <div class="alert alert-light border small">
+                  <div class="fw-semibold mb-1">{{ centro.nombre_centro }}</div>
+                  <div class="text-muted-soft">
+                    <i class="bi bi-geo-alt me-1"></i>{{ centro.direccion }}, {{ centro.distrito }}
+                  </div>
+                  @if (centro.telefono) {
+                    <div class="text-muted-soft">
+                      <i class="bi bi-telephone me-1"></i>{{ centro.telefono }}
+                    </div>
+                  }
+                </div>
+              }
+
+              <button
+                type="submit"
+                class="btn btn-raee btn-lg w-100"
+                [disabled]="formulario().submitting()"
+              >
+                @if (formulario().submitting()) {
+                  <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                } @else {
+                  <i class="bi bi-calendar-check me-1"></i>
+                }
+                Confirmar solicitud
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="card card-raee">
+          <div class="card-body p-4">
+            <h2 class="h6 mb-3"><i class="bi bi-pc-display me-2 text-raee"></i>Equipo seleccionado</h2>
+            <div class="mb-2">
+              <span class="codigo-chip">{{ dispositivo()!.codigo_seguimiento }}</span>
+            </div>
+            <div class="fw-semibold">{{ dispositivo()!.categoria }}</div>
+            <p class="text-muted-soft small mb-2">
+              {{ dispositivo()!.marca || 'Sin marca' }}
+              @if (dispositivo()!.modelo) {
+                · {{ dispositivo()!.modelo }}
+              }
+            </p>
+            @if (dispositivo()!.descripcion) {
+              <p class="small mb-2">{{ dispositivo()!.descripcion }}</p>
+            }
+            <app-estado-badge [estado]="dispositivo()!.estado_actual" tipo="raee" />
+
+            <hr />
+
+            <h3 class="h6">Antes de entregar</h3>
+            <ul class="small text-muted-soft mb-0 ps-3">
+              <li class="mb-1">Borra tus datos personales del equipo.</li>
+              <li class="mb-1">Retira pilas o baterías sueltas.</li>
+              <li>Lleva tu código de seguimiento impreso o en tu celular.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

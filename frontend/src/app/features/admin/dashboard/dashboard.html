@@ -1,0 +1,108 @@
+<div class="container py-4">
+  <app-page-header
+    titulo="Panel de control"
+    subtitulo="Indicadores generales de la gestión de RAEE en Huancayo."
+    icono="bi-speedometer2"
+  >
+    <a class="btn btn-outline-raee" routerLink="/admin/centros">
+      <i class="bi bi-buildings me-1"></i>Centros
+    </a>
+    <a class="btn btn-outline-raee" routerLink="/admin/usuarios">
+      <i class="bi bi-people me-1"></i>Usuarios
+    </a>
+    <button class="btn btn-raee" type="button" (click)="resumen.reload()">
+      <i class="bi bi-arrow-clockwise me-1"></i>Actualizar
+    </button>
+  </app-page-header>
+
+  @if (resumen.isLoading()) {
+    <app-loading texto="Calculando indicadores..." />
+  } @else if (resumen.error()) {
+    <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+      <i class="bi bi-exclamation-octagon-fill"></i>
+      <span class="flex-grow-1">No se pudieron cargar los indicadores.</span>
+      <button class="btn btn-sm btn-outline-danger" type="button" (click)="resumen.reload()">
+        Reintentar
+      </button>
+    </div>
+  } @else if (resumen.value(); as datos) {
+    <div class="row g-3 mb-4">
+      @for (kpi of kpis(datos); track kpi.etiqueta) {
+        <div class="col-6 col-lg-4 col-xl">
+          <div class="stat-card h-100">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="stat-label">{{ kpi.etiqueta }}</span>
+              <i [class]="'bi fs-5 ' + kpi.icono + ' ' + kpi.clase"></i>
+            </div>
+            <div [class]="'stat-value ' + kpi.clase">{{ kpi.valor }}</div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-lg-4">
+        <div class="card card-raee h-100">
+          <div class="card-body">
+            <div class="stat-label mb-2">Peso total registrado</div>
+            <div class="stat-value text-raee mb-1">{{ datos.peso_total_kg | pesoKg }}</div>
+            <p class="small text-muted-soft mb-0">
+              Peso acumulado de los equipos evaluados.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-lg-4">
+        <div class="card card-raee h-100">
+          <div class="card-body">
+            <div class="stat-label mb-2">Peso valorizado</div>
+            <div class="stat-value text-success mb-1">{{ datos.peso_valorizado_kg | pesoKg }}</div>
+            <div class="progress" role="progressbar" aria-label="Proporción valorizada" [attr.aria-valuenow]="proporcionValorizacion()" aria-valuemin="0" aria-valuemax="100">
+              <div class="progress-bar bg-success" [style.width.%]="proporcionValorizacion()"></div>
+            </div>
+            <p class="small text-muted-soft mt-2 mb-0">
+              {{ proporcionValorizacion() | number: '1.0-1' }}% del peso total.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-lg-4">
+        <div class="card card-raee h-100">
+          <div class="card-body">
+            <div class="stat-label mb-2">Peso a disposición final</div>
+            <div class="stat-value text-secondary mb-1">{{ datos.peso_disposicion_final_kg | pesoKg }}</div>
+            <div class="progress" role="progressbar" aria-label="Proporción a disposición final" [attr.aria-valuenow]="proporcionDisposicion()" aria-valuemin="0" aria-valuemax="100">
+              <div class="progress-bar bg-secondary" [style.width.%]="proporcionDisposicion()"></div>
+            </div>
+            <p class="small text-muted-soft mt-2 mb-0">
+              {{ proporcionDisposicion() | number: '1.0-1' }}% del peso total.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-raee">
+      <div class="card-body p-4">
+        <h2 class="h6 mb-3">Distribución por estado</h2>
+        @if (datos.total_dispositivos === 0) {
+          <p class="text-muted-soft mb-0">Aún no hay equipos registrados en el sistema.</p>
+        } @else {
+          <div class="row g-3">
+            @for (item of distribucion(); track item.etiqueta) {
+              <div class="col-md-6">
+                <div class="d-flex justify-content-between small mb-1">
+                  <span class="fw-semibold">{{ item.etiqueta }}</span>
+                  <span class="text-muted-soft">{{ item.valor }} equipos</span>
+                </div>
+                <div class="progress" role="progressbar" [attr.aria-label]="item.etiqueta" [attr.aria-valuenow]="item.porcentaje" aria-valuemin="0" aria-valuemax="100">
+                  <div [class]="'progress-bar ' + item.clase" [style.width.%]="item.porcentaje"></div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

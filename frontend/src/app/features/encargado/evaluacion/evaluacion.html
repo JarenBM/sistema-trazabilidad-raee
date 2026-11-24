@@ -1,0 +1,251 @@
+<div class="container py-4">
+  <app-page-header
+    titulo="Evaluación técnica del equipo"
+    subtitulo="Registra la condición, el peso y el destino final del RAEE recibido."
+    icono="bi-clipboard-check"
+    volver="/encargado"
+  />
+
+  @if (solicitudes.isLoading()) {
+    <app-loading texto="Cargando la solicitud..." />
+  } @else if (!solicitud()) {
+    <div class="card card-raee">
+      <app-empty-state
+        titulo="No encontramos la solicitud"
+        mensaje="El equipo no pertenece a tu centro o la solicitud ya no está disponible."
+        icono="bi-clipboard-x"
+      >
+        <a class="btn btn-raee" routerLink="/encargado">Volver a la bandeja</a>
+      </app-empty-state>
+    </div>
+  } @else {
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="card card-raee">
+          <div class="card-body p-4 p-lg-5">
+            @if (resultado(); as registro) {
+              <div class="text-center mb-4">
+                <span class="icon-circle mx-auto mb-3"><i class="bi bi-check2-circle"></i></span>
+                <h2 class="h4 mb-1">Evaluación registrada</h2>
+                <p class="text-muted-soft mb-0">
+                  Evaluación N.º {{ registro.id_evaluacion }}. La trazabilidad del
+                  equipo fue actualizada.
+                </p>
+              </div>
+
+              <div class="bg-raee-suave rounded-3 p-3 mb-4">
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="text-muted-soft small">Tipo de destino</span>
+                  <span class="fw-semibold">{{ destinoSeleccionado()?.nombre }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="text-muted-soft small">Valorización</span>
+                  @if (destinoSeleccionado()?.es_valorizacion) {
+                    <span class="badge text-bg-success">Sí, valorizable</span>
+                  } @else {
+                    <span class="badge text-bg-secondary">Disposición final</span>
+                  }
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span class="text-muted-soft small">Peso registrado</span>
+                  <span class="fw-semibold">{{ modelo().peso }} kg</span>
+                </div>
+              </div>
+
+              <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
+                <a
+                  class="btn btn-raee"
+                  routerLink="/rastreo"
+                  [queryParams]="{ codigo: solicitud()!.codigo_seguimiento }"
+                >
+                  <i class="bi bi-search me-1"></i>Ver trazabilidad
+                </a>
+                <a class="btn btn-outline-raee" routerLink="/encargado">
+                  <i class="bi bi-inbox me-1"></i>Volver a la bandeja
+                </a>
+              </div>
+            } @else {
+              @if (solicitud()!.estado_raee_actual !== 'RECIBIDO') {
+                <div class="alert alert-warning d-flex align-items-start gap-2" role="alert">
+                  <i class="bi bi-exclamation-triangle-fill"></i>
+                  <div>
+                    El equipo debe estar en estado <strong>Recibido</strong> para
+                    registrar su evaluación técnica. Estado actual:
+                    <app-estado-badge [estado]="solicitud()!.estado_raee_actual" tipo="raee" />
+                  </div>
+                </div>
+              }
+
+              @if (error(); as mensaje) {
+                <div class="alert alert-danger d-flex align-items-start gap-2" role="alert">
+                  <i class="bi bi-exclamation-octagon-fill"></i>
+                  <span>{{ mensaje }}</span>
+                </div>
+              }
+
+              <form [formRoot]="formulario" novalidate>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label" for="condicion">Condición física</label>
+                    <select id="condicion" class="form-select" [formField]="formulario.condicion">
+                      <option value="">Selecciona una condición</option>
+                      @for (condicion of condiciones; track condicion.valor) {
+                        <option [value]="condicion.valor">{{ condicion.etiqueta }}</option>
+                      }
+                    </select>
+                    @if (formulario.condicion().touched() && formulario.condicion().invalid()) {
+                      <div class="invalid-feedback d-block">
+                        {{ formulario.condicion().errors()[0]?.message }}
+                      </div>
+                    }
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label" for="peso">Peso (kg)</label>
+                    <input
+                      id="peso"
+                      type="number"
+                      class="form-control"
+                      step="0.01"
+                      placeholder="Ejemplo: 2.35"
+                      [formField]="formulario.peso"
+                    />
+                    @if (formulario.peso().touched() && formulario.peso().invalid()) {
+                      <div class="invalid-feedback d-block">
+                        {{ formulario.peso().errors()[0]?.message }}
+                      </div>
+                    }
+                  </div>
+
+                  <div class="col-12">
+                    <label class="form-label" for="destino">Tipo de destino</label>
+                    <select id="destino" class="form-select" [formField]="formulario.idDestino">
+                      <option value="">Selecciona el destino</option>
+                      @for (destino of destinos.value(); track destino.id_tipo_destino) {
+                        <option [value]="destino.id_tipo_destino">{{ destino.nombre }}</option>
+                      }
+                    </select>
+                    @if (formulario.idDestino().touched() && formulario.idDestino().invalid()) {
+                      <div class="invalid-feedback d-block">
+                        {{ formulario.idDestino().errors()[0]?.message }}
+                      </div>
+                    }
+                  </div>
+
+                  @if (destinoSeleccionado(); as destino) {
+                    <div class="col-12">
+                      <div class="alert alert-light border small mb-0">
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                          <span class="fw-semibold">{{ destino.nombre }}</span>
+                          @if (destino.es_valorizacion) {
+                            <span class="badge text-bg-success">Valorización</span>
+                          } @else {
+                            <span class="badge text-bg-secondary">Disposición final</span>
+                          }
+                        </div>
+                        @if (destino.descripcion) {
+                          <div class="text-muted-soft mt-1">{{ destino.descripcion }}</div>
+                        }
+                      </div>
+                    </div>
+                  }
+
+                  <div class="col-12">
+                    <div class="form-check form-switch">
+                      <input
+                        id="operativo"
+                        type="checkbox"
+                        class="form-check-input"
+                        [formField]="formulario.esOperativo"
+                      />
+                      <label class="form-check-label" for="operativo">
+                        El equipo se encuentra operativo
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="col-12">
+                    <label class="form-label" for="observaciones">
+                      Observaciones <span class="text-muted-soft">(opcional)</span>
+                    </label>
+                    <textarea
+                      id="observaciones"
+                      class="form-control"
+                      rows="3"
+                      placeholder="Detalles del estado, componentes faltantes u otras notas."
+                      [formField]="formulario.observaciones"
+                    ></textarea>
+                    @if (formulario.observaciones().touched() && formulario.observaciones().invalid()) {
+                      <div class="invalid-feedback d-block">
+                        {{ formulario.observaciones().errors()[0]?.message }}
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  class="btn btn-raee btn-lg w-100 mt-4"
+                  [disabled]="formulario().submitting() || solicitud()!.estado_raee_actual !== 'RECIBIDO'"
+                >
+                  @if (formulario().submitting()) {
+                    <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                  } @else {
+                    <i class="bi bi-save me-1"></i>
+                  }
+                  Registrar evaluación
+                </button>
+              </form>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card card-raee">
+          <div class="card-body p-4">
+            <h2 class="h6 mb-3"><i class="bi bi-clipboard-data me-2 text-raee"></i>Solicitud</h2>
+            <div class="mb-2">
+              <span class="codigo-chip">{{ solicitud()!.codigo_seguimiento }}</span>
+            </div>
+            <div class="fw-semibold">{{ solicitud()!.categoria }}</div>
+            <p class="text-muted-soft small mb-2">
+              {{ solicitud()!.marca || 'Sin marca' }}
+              @if (solicitud()!.modelo) {
+                · {{ solicitud()!.modelo }}
+              }
+            </p>
+            <div class="mb-2">
+              <app-estado-badge [estado]="solicitud()!.estado_raee_actual" tipo="raee" />
+            </div>
+
+            <hr />
+
+            <div class="small">
+              <div class="mb-2">
+                <span class="text-muted-soft d-block">Ciudadano</span>
+                <span class="fw-semibold">{{ solicitud()!.ciudadano }}</span>
+              </div>
+              @if (solicitud()!.telefono_ciudadano) {
+                <div class="mb-2">
+                  <span class="text-muted-soft d-block">Teléfono</span>
+                  <a class="text-decoration-none" [href]="'tel:' + solicitud()!.telefono_ciudadano">
+                    {{ solicitud()!.telefono_ciudadano }}
+                  </a>
+                </div>
+              }
+              <div class="mb-2">
+                <span class="text-muted-soft d-block">Modalidad</span>
+                {{ solicitud()!.tipo_solicitud === 'RECOLECCION' ? 'Recolección' : 'Entrega presencial' }}
+              </div>
+              <div>
+                <span class="text-muted-soft d-block">Fecha programada</span>
+                {{ solicitud()!.fecha_programada | fechaHora }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

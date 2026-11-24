@@ -1,0 +1,163 @@
+<div class="container py-4">
+  <app-page-header
+    titulo="Registrar un equipo RAEE"
+    subtitulo="Completa los datos del aparato que deseas entregar."
+    icono="bi-plus-square"
+    volver="/ciudadano"
+  />
+
+  @if (registrado(); as registro) {
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+        <div class="card card-raee">
+          <div class="card-body p-4 p-lg-5 text-center">
+            <span class="icon-circle mx-auto mb-3"><i class="bi bi-check2-circle"></i></span>
+            <h2 class="h4 mb-2">¡Equipo registrado!</h2>
+            <p class="text-muted-soft">
+              Guarda este código de seguimiento. Lo necesitarás para consultar la
+              trazabilidad y coordinar la entrega.
+            </p>
+
+            <div class="d-flex justify-content-center align-items-center gap-2 mb-4">
+              <span class="codigo-chip fs-4">{{ registro.codigo_seguimiento }}</span>
+              <button
+                class="btn btn-sm btn-outline-secondary"
+                type="button"
+                (click)="copiarCodigo()"
+                aria-label="Copiar código"
+              >
+                <i class="bi bi-clipboard"></i>
+              </button>
+            </div>
+
+            <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
+              <a
+                class="btn btn-raee"
+                [routerLink]="['/ciudadano/solicitud', registro.id_raee]"
+              >
+                <i class="bi bi-calendar-check me-1"></i>Programar entrega
+              </a>
+              <a class="btn btn-outline-raee" routerLink="/ciudadano">
+                <i class="bi bi-list-check me-1"></i>Ver mis equipos
+              </a>
+              <button class="btn btn-outline-secondary" type="button" (click)="registrarOtro()">
+                <i class="bi bi-plus-lg me-1"></i>Registrar otro
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card card-raee">
+          <div class="card-body p-4 p-lg-5">
+            @if (error(); as mensaje) {
+              <div class="alert alert-danger d-flex align-items-start gap-2" role="alert">
+                <i class="bi bi-exclamation-octagon-fill"></i>
+                <span>{{ mensaje }}</span>
+              </div>
+            }
+
+            @if (categorias.isLoading()) {
+              <app-loading texto="Cargando categorías..." />
+            }
+
+            <form [formRoot]="formulario" novalidate>
+              <div class="mb-3">
+                <label class="form-label" for="categoria">Categoría del equipo</label>
+                <select id="categoria" class="form-select" [formField]="formulario.idCategoria">
+                  <option value="">Selecciona una categoría</option>
+                  @for (categoria of categorias.value(); track categoria.id_categoria) {
+                    <option [value]="categoria.id_categoria">{{ categoria.nombre }}</option>
+                  }
+                </select>
+                @if (formulario.idCategoria().touched() && formulario.idCategoria().invalid()) {
+                  <div class="invalid-feedback d-block">
+                    {{ formulario.idCategoria().errors()[0]?.message }}
+                  </div>
+                }
+              </div>
+
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label" for="marca">Marca</label>
+                  <input
+                    id="marca"
+                    type="text"
+                    class="form-control"
+                    placeholder="Lenovo, Samsung, LG..."
+                    [formField]="formulario.marca"
+                  />
+                  @if (formulario.marca().touched() && formulario.marca().invalid()) {
+                    <div class="invalid-feedback d-block">
+                      {{ formulario.marca().errors()[0]?.message }}
+                    </div>
+                  }
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label" for="modelo">Modelo</label>
+                  <input
+                    id="modelo"
+                    type="text"
+                    class="form-control"
+                    placeholder="IdeaPad 330"
+                    [formField]="formulario.modelo"
+                  />
+                  @if (formulario.modelo().touched() && formulario.modelo().invalid()) {
+                    <div class="invalid-feedback d-block">
+                      {{ formulario.modelo().errors()[0]?.message }}
+                    </div>
+                  }
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label" for="descripcion">
+                    Descripción <span class="text-muted-soft">(opcional)</span>
+                  </label>
+                  <textarea
+                    id="descripcion"
+                    class="form-control"
+                    rows="3"
+                    placeholder="Estado del equipo, accesorios incluidos u observaciones."
+                    [formField]="formulario.descripcion"
+                  ></textarea>
+                  @if (formulario.descripcion().touched() && formulario.descripcion().invalid()) {
+                    <div class="invalid-feedback d-block">
+                      {{ formulario.descripcion().errors()[0]?.message }}
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <div class="alert alert-light border small mt-4 mb-3">
+                <i class="bi bi-info-circle me-1 text-raee"></i>
+                Retira pilas, baterías y cartuchos que puedan estar sueltos. Si el
+                equipo contiene datos personales, borra la información antes de
+                entregarlo.
+              </div>
+
+              <div class="d-flex flex-column flex-sm-row gap-2">
+                <button
+                  type="submit"
+                  class="btn btn-raee btn-lg"
+                  [disabled]="formulario().submitting()"
+                >
+                  @if (formulario().submitting()) {
+                    <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                  } @else {
+                    <i class="bi bi-save me-1"></i>
+                  }
+                  Registrar equipo
+                </button>
+                <a class="btn btn-outline-secondary btn-lg" routerLink="/ciudadano">Cancelar</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
