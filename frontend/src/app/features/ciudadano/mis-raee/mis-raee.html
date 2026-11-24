@@ -1,0 +1,181 @@
+<div class="container py-4">
+  <app-page-header
+    titulo="Mis equipos RAEE"
+    subtitulo="Registra, programa la entrega y consulta el estado de tus equipos."
+    icono="bi-pc-display"
+  >
+    <a class="btn btn-raee" routerLink="/ciudadano/registrar">
+      <i class="bi bi-plus-lg me-1"></i>Registrar equipo
+    </a>
+  </app-page-header>
+
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-value">{{ resumen().total }}</div>
+        <div class="stat-label">Equipos registrados</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-value text-secondary">{{ resumen().registrados }}</div>
+        <div class="stat-label">Listos para entregar</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-value text-warning">{{ resumen().enProceso }}</div>
+        <div class="stat-label">En proceso</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-value text-success">{{ resumen().evaluados }}</div>
+        <div class="stat-label">Evaluados</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-raee mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+          <label class="form-label" for="estado">Estado</label>
+          <select
+            id="estado"
+            class="form-select"
+            [value]="filtroEstado()"
+            (change)="filtroEstado.set($any($event.target).value)"
+          >
+            <option value="">Todos los estados</option>
+            <option value="REGISTRADO">Registrado</option>
+            <option value="SOLICITADO">Solicitado</option>
+            <option value="RECIBIDO">Recibido</option>
+            <option value="EVALUADO">Evaluado</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="buscar">Buscar</label>
+          <input
+            id="buscar"
+            type="search"
+            class="form-control"
+            placeholder="Código, marca, modelo o categoría"
+            [value]="busqueda()"
+            (input)="busqueda.set($any($event.target).value)"
+          />
+        </div>
+        <div class="col-md-2 d-grid">
+          <button class="btn btn-outline-secondary" type="button" (click)="limpiar()">
+            <i class="bi bi-x-circle me-1"></i>Limpiar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (dispositivos.isLoading()) {
+    <app-loading texto="Cargando tus equipos..." />
+  } @else if (dispositivos.error()) {
+    <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+      <i class="bi bi-exclamation-octagon-fill"></i>
+      <span class="flex-grow-1">No se pudieron cargar tus equipos.</span>
+      <button class="btn btn-sm btn-outline-danger" type="button" (click)="dispositivos.reload()">
+        Reintentar
+      </button>
+    </div>
+  } @else if (dispositivosFiltrados().length === 0) {
+    <div class="card card-raee">
+      <app-empty-state
+        titulo="Aún no tienes equipos registrados"
+        mensaje="Registra tu primer aparato electrónico para iniciar su trazabilidad."
+        icono="bi-pc-display"
+      >
+        <a class="btn btn-raee" routerLink="/ciudadano/registrar">
+          <i class="bi bi-plus-lg me-1"></i>Registrar mi primer equipo
+        </a>
+      </app-empty-state>
+    </div>
+  } @else {
+    <div class="row g-3">
+      @for (dispositivo of dispositivosFiltrados(); track dispositivo.id_raee) {
+        <div class="col-md-6 col-xl-4">
+          <div class="card card-raee h-100">
+            <div class="card-body d-flex flex-column p-4">
+              <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                <span class="codigo-chip">{{ dispositivo.codigo_seguimiento }}</span>
+                <app-estado-badge [estado]="dispositivo.estado_actual" tipo="raee" />
+              </div>
+
+              <h2 class="h6 mb-1">{{ dispositivo.categoria }}</h2>
+              <p class="text-muted-soft small mb-2">
+                {{ dispositivo.marca || 'Sin marca' }}
+                @if (dispositivo.modelo) {
+                  · {{ dispositivo.modelo }}
+                }
+              </p>
+
+              @if (dispositivo.descripcion) {
+                <p class="small mb-2">{{ dispositivo.descripcion }}</p>
+              }
+
+              <ul class="list-unstyled small text-muted-soft mb-3">
+                <li class="mb-1">
+                  <i class="bi bi-calendar3 me-1"></i>
+                  Registrado el {{ dispositivo.fecha_registro | fechaHora }}
+                </li>
+                @if (dispositivo.peso_kg !== null) {
+                  <li class="mb-1">
+                    <i class="bi bi-speedometer2 me-1"></i>
+                    Peso: {{ dispositivo.peso_kg | pesoKg }}
+                  </li>
+                }
+                @if (dispositivo.destino_final) {
+                  <li>
+                    <i class="bi bi-arrow-repeat me-1"></i>
+                    Destino: {{ dispositivo.destino_final }}
+                  </li>
+                }
+              </ul>
+
+              <div class="d-flex flex-wrap gap-2 mt-auto">
+                @if (dispositivo.estado_actual === 'REGISTRADO') {
+                  <a
+                    class="btn btn-sm btn-raee"
+                    [routerLink]="['/ciudadano/solicitud', dispositivo.id_raee]"
+                  >
+                    <i class="bi bi-calendar-check me-1"></i>Programar entrega
+                  </a>
+                }
+
+                @if (solicitudPendiente(dispositivo.id_raee); as solicitud) {
+                  <button
+                    class="btn btn-sm btn-outline-danger"
+                    type="button"
+                    [disabled]="cancelando() === solicitud.id_solicitud"
+                    (click)="cancelar(solicitud)"
+                  >
+                    @if (cancelando() === solicitud.id_solicitud) {
+                      <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                    } @else {
+                      <i class="bi bi-x-circle me-1"></i>
+                    }
+                    Cancelar solicitud
+                  </button>
+                }
+
+                <a
+                  class="btn btn-sm btn-outline-raee"
+                  routerLink="/rastreo"
+                  [queryParams]="{ codigo: dispositivo.codigo_seguimiento }"
+                >
+                  <i class="bi bi-search me-1"></i>Ver trazabilidad
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

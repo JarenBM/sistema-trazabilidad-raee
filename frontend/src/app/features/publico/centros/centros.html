@@ -1,0 +1,106 @@
+<div class="container py-4 py-lg-5">
+  <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+    <div>
+      <h1 class="h3 mb-1"><i class="bi bi-geo-alt me-2 text-raee"></i>Centros de acopio</h1>
+      <p class="text-muted-soft mb-0">
+        Encuentra el punto más cercano para entregar tus residuos electrónicos.
+      </p>
+    </div>
+    <a class="btn btn-outline-raee" routerLink="/rastreo">
+      <i class="bi bi-search me-1"></i>Consultar trazabilidad
+    </a>
+  </div>
+
+  <div class="card card-raee mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-5">
+          <label class="form-label" for="distrito">Distrito</label>
+          <select
+            id="distrito"
+            class="form-select"
+            [ngModel]="distritoSeleccionado()"
+            (ngModelChange)="distritoSeleccionado.set($event)"
+          >
+            <option value="">Todos los distritos</option>
+            @for (distrito of distritos.value(); track distrito.ubigeo) {
+              <option [value]="distrito.ubigeo">{{ distrito.distrito }}</option>
+            }
+          </select>
+        </div>
+        <div class="col-md-5">
+          <label class="form-label" for="busqueda">Buscar por nombre o dirección</label>
+          <input
+            id="busqueda"
+            type="search"
+            class="form-control"
+            placeholder="Ejemplo: El Tambo"
+            [ngModel]="busqueda()"
+            (ngModelChange)="busqueda.set($event)"
+          />
+        </div>
+        <div class="col-md-2 d-grid">
+          <button type="button" class="btn btn-outline-secondary" (click)="limpiar()">
+            <i class="bi bi-x-circle me-1"></i>Limpiar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (centros.isLoading()) {
+    <app-loading texto="Cargando centros de acopio..." />
+  } @else if (centros.error()) {
+    <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+      <i class="bi bi-exclamation-octagon-fill"></i>
+      <span class="flex-grow-1">No se pudieron cargar los centros de acopio.</span>
+      <button type="button" class="btn btn-sm btn-outline-danger" (click)="centros.reload()">
+        Reintentar
+      </button>
+    </div>
+  } @else if (centrosFiltrados().length === 0) {
+    <div class="card card-raee">
+      <app-empty-state
+        titulo="No encontramos centros con ese filtro"
+        mensaje="Prueba con otro distrito o limpia la búsqueda."
+        icono="bi-geo-alt"
+      >
+        <button type="button" class="btn btn-outline-raee" (click)="limpiar()">Ver todos los centros</button>
+      </app-empty-state>
+    </div>
+  } @else {
+    <div class="row g-3">
+      @for (centro of centrosFiltrados(); track centro.id_centro) {
+        <div class="col-md-6 col-xl-4">
+          <div class="card card-raee card-raee-hover h-100">
+            <div class="card-body d-flex flex-column p-4">
+              <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                <h2 class="h6 mb-0">{{ centro.nombre_centro }}</h2>
+                <span class="badge text-bg-success">Activo</span>
+              </div>
+              <p class="text-muted-soft small mb-2">
+                <i class="bi bi-geo me-1"></i>{{ centro.direccion }}
+              </p>
+              <p class="text-muted-soft small mb-2">
+                <i class="bi bi-map me-1"></i>{{ centro.distrito }}
+              </p>
+              @if (centro.telefono) {
+                <p class="text-muted-soft small mb-3">
+                  <i class="bi bi-telephone me-1"></i>{{ centro.telefono }}
+                </p>
+              }
+              <a
+                class="btn btn-outline-raee mt-auto"
+                [href]="enlaceMapa(centro)"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <i class="bi bi-signpost-split me-1"></i>Cómo llegar
+              </a>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

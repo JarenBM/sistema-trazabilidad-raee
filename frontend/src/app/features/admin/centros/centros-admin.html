@@ -1,0 +1,212 @@
+<div class="container py-4">
+  <app-page-header
+    titulo="Gestión de centros de acopio"
+    subtitulo="Crea centros, consulta su ubicación y controla su disponibilidad."
+    icono="bi-buildings"
+  >
+    <button class="btn btn-raee" type="button" (click)="abrirFormulario()">
+      <i class="bi bi-plus-lg me-1"></i>Nuevo centro
+    </button>
+    <button class="btn btn-outline-raee" type="button" (click)="centros.reload()">
+      <i class="bi bi-arrow-clockwise me-1"></i>Actualizar
+    </button>
+  </app-page-header>
+
+  @if (mostrarFormulario()) {
+    <div class="card card-raee mb-4 fade-in">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <h2 class="h5 mb-0"><i class="bi bi-plus-square me-2 text-raee"></i>Registrar centro</h2>
+          <button class="btn-close" type="button" aria-label="Cerrar formulario" (click)="cerrarFormulario()"></button>
+        </div>
+
+        @if (error(); as mensaje) {
+          <div class="alert alert-danger d-flex align-items-start gap-2" role="alert">
+            <i class="bi bi-exclamation-octagon-fill"></i>
+            <span>{{ mensaje }}</span>
+          </div>
+        }
+
+        <form [formRoot]="formulario" novalidate>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" for="nombreCentro">Nombre del centro</label>
+              <input id="nombreCentro" type="text" class="form-control" placeholder="Centro de acopio El Tambo" [formField]="formulario.nombreCentro" />
+              @if (formulario.nombreCentro().touched() && formulario.nombreCentro().invalid()) {
+                <div class="invalid-feedback d-block">{{ formulario.nombreCentro().errors()[0]?.message }}</div>
+              }
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label" for="telefonoCentro">Teléfono <span class="text-muted-soft">(opcional)</span></label>
+              <input id="telefonoCentro" type="tel" class="form-control" placeholder="064 123456" [formField]="formulario.telefono" />
+              @if (formulario.telefono().touched() && formulario.telefono().invalid()) {
+                <div class="invalid-feedback d-block">{{ formulario.telefono().errors()[0]?.message }}</div>
+              }
+            </div>
+
+            <div class="col-12">
+              <label class="form-label" for="direccionCentro">Dirección</label>
+              <input id="direccionCentro" type="text" class="form-control" placeholder="Av. Huancavelica 123" [formField]="formulario.direccion" />
+              @if (formulario.direccion().touched() && formulario.direccion().invalid()) {
+                <div class="invalid-feedback d-block">{{ formulario.direccion().errors()[0]?.message }}</div>
+              }
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label" for="ubigeoCentro">Distrito</label>
+              <select id="ubigeoCentro" class="form-select" [formField]="formulario.ubigeo">
+                <option value="">Selecciona un distrito</option>
+                @for (distrito of distritos.value(); track distrito.ubigeo) {
+                  <option [value]="distrito.ubigeo">{{ distrito.distrito }}</option>
+                }
+              </select>
+              @if (formulario.ubigeo().touched() && formulario.ubigeo().invalid()) {
+                <div class="invalid-feedback d-block">{{ formulario.ubigeo().errors()[0]?.message }}</div>
+              }
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label" for="latitud">Latitud <span class="text-muted-soft">(opcional)</span></label>
+              <input id="latitud" type="number" class="form-control" step="0.000001" placeholder="-12.065" [formField]="formulario.latitud" />
+              @if (formulario.latitud().touched() && formulario.latitud().invalid()) {
+                <div class="invalid-feedback d-block">{{ formulario.latitud().errors()[0]?.message }}</div>
+              }
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label" for="longitud">Longitud <span class="text-muted-soft">(opcional)</span></label>
+              <input id="longitud" type="number" class="form-control" step="0.000001" placeholder="-75.210" [formField]="formulario.longitud" />
+              @if (formulario.longitud().touched() && formulario.longitud().invalid()) {
+                <div class="invalid-feedback d-block">{{ formulario.longitud().errors()[0]?.message }}</div>
+              }
+            </div>
+          </div>
+
+          <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
+            <button class="btn btn-raee" type="submit" [disabled]="formulario().submitting()">
+              @if (formulario().submitting()) {
+                <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+              } @else {
+                <i class="bi bi-save me-1"></i>
+              }
+              Guardar centro
+            </button>
+            <button class="btn btn-outline-secondary" type="button" (click)="cerrarFormulario()">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <div class="card card-raee mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label" for="filtroDistrito">Distrito</label>
+          <select id="filtroDistrito" class="form-select" [value]="filtroDistrito()" (change)="filtroDistrito.set($any($event.target).value)">
+            <option value="">Todos</option>
+            @for (distrito of distritos.value(); track distrito.ubigeo) {
+              <option [value]="distrito.ubigeo">{{ distrito.distrito }}</option>
+            }
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="filtroEstado">Estado</label>
+          <select id="filtroEstado" class="form-select" [value]="filtroEstado()" (change)="filtroEstado.set($any($event.target).value)">
+            <option value="">Todos</option>
+            <option value="activos">Activos</option>
+            <option value="inactivos">Inactivos</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="buscarCentro">Buscar</label>
+          <input id="buscarCentro" type="search" class="form-control" placeholder="Nombre, dirección o distrito" [value]="busqueda()" (input)="busqueda.set($any($event.target).value)" />
+        </div>
+        <div class="col-md-2 d-grid">
+          <button class="btn btn-outline-secondary" type="button" (click)="limpiar()">
+            <i class="bi bi-x-circle me-1"></i>Limpiar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (centros.isLoading()) {
+    <app-loading texto="Cargando centros de acopio..." />
+  } @else if (centros.error()) {
+    <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+      <i class="bi bi-exclamation-octagon-fill"></i>
+      <span class="flex-grow-1">No se pudieron cargar los centros.</span>
+      <button class="btn btn-sm btn-outline-danger" type="button" (click)="centros.reload()">Reintentar</button>
+    </div>
+  } @else if (filtrados().length === 0) {
+    <div class="card card-raee">
+      <app-empty-state titulo="No hay centros con ese filtro" mensaje="Ajusta los filtros o registra un nuevo centro de acopio." icono="bi-buildings">
+        <button class="btn btn-raee" type="button" (click)="abrirFormulario()">
+          <i class="bi bi-plus-lg me-1"></i>Nuevo centro
+        </button>
+      </app-empty-state>
+    </div>
+  } @else {
+    <div class="card card-raee">
+      <div class="table-responsive">
+        <table class="table table-hover table-raee align-middle mb-0">
+          <thead>
+            <tr>
+              <th scope="col">Centro</th>
+              <th scope="col">Distrito</th>
+              <th scope="col">Teléfono</th>
+              <th scope="col">Coordenadas</th>
+              <th scope="col">Estado</th>
+              <th scope="col" class="text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (centro of filtrados(); track centro.id_centro) {
+              <tr>
+                <td>
+                  <div class="fw-semibold">{{ centro.nombre_centro }}</div>
+                  <div class="small text-muted-soft">{{ centro.direccion }}</div>
+                </td>
+                <td>{{ centro.distrito }}</td>
+                <td>{{ centro.telefono || '—' }}</td>
+                <td class="small text-muted-soft">
+                  @if (centro.latitud !== null && centro.longitud !== null) {
+                    {{ centro.latitud }}, {{ centro.longitud }}
+                  } @else {
+                    Sin coordenadas
+                  }
+                </td>
+                <td>
+                  @if (centro.activo) {
+                    <span class="badge text-bg-success">Activo</span>
+                  } @else {
+                    <span class="badge text-bg-secondary">Inactivo</span>
+                  }
+                </td>
+                <td class="text-end">
+                  <button
+                    class="btn btn-sm"
+                    [class.btn-outline-danger]="centro.activo"
+                    [class.btn-outline-success]="!centro.activo"
+                    type="button"
+                    [disabled]="procesando() === centro.id_centro"
+                    (click)="cambiarEstado(centro)"
+                  >
+                    @if (procesando() === centro.id_centro) {
+                      <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                    } @else {
+                      <i [class]="centro.activo ? 'bi bi-pause-circle me-1' : 'bi bi-play-circle me-1'"></i>
+                    }
+                    {{ centro.activo ? 'Desactivar' : 'Activar' }}
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>
